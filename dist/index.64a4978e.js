@@ -537,50 +537,50 @@ var _orbitControlsJs = require("three/examples/jsm/controls/OrbitControls.js");
 var _gltfloaderJs = require("three/examples/jsm/loaders/GLTFLoader.js");
 var _rgbeloaderJs = require("three/examples/jsm/loaders/RGBELoader.js");
 //import {Box3, Vector3} from 'three';
-const renderer = new _three.WebGLRenderer({
-    antialias: true
-});
+var clock = new _three.Clock();
+var scene = new _three.Scene();
+var camera = new _three.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+var renderer = new _three.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
-const scene = new _three.Scene();
-const camera = new _three.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
-renderer.setClearColor(0xA3A3A3);
-const orbit = new (0, _orbitControlsJs.OrbitControls)(camera, renderer.domElement);
-camera.position.set(0, 1, 2);
-orbit.update();
-const grid = new _three.GridHelper(30, 30);
-scene.add(grid);
-const ambientLight = new _three.AmbientLight(0xededed, 0.8);
-scene.add(ambientLight);
-const directionalLight = new _three.DirectionalLight(0xFFFFFF, 1);
-scene.add(directionalLight);
-directionalLight.position.set(10, 11, 7);
-// const geometry = new THREE.BoxGeometry( 1, 1, 1 );
-// const material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
-// const cube = new THREE.Mesh( geometry, material );
-// scene.add( cube );
-const gltfLoader = new (0, _gltfloaderJs.GLTFLoader)();
-const rgbeLoader = new (0, _rgbeloaderJs.RGBELoader)();
-//renderer.outputEncoding = THREE.sRGBEncoding;
-// renderer.toneMapping = THREE.ACESFilmicToneMapping;
-// renderer.toneMappingExposure = 4;
-let car;
-gltfLoader.load("./assets/scene.gltf", function(gltf) {
-    const model = gltf.scene;
-    model.scale.set(0.006, 0.006, 0.006);
+renderer.setClearColor(0x606060);
+var loader = new (0, _gltfloaderJs.GLTFLoader)();
+loader.load("assets/scene.gltf", function(gltf) {
+    var model = gltf.scene;
     scene.add(model);
-    car = model;
+    mixer = new _three.AnimationMixer(model);
+    mixer.clipAction(gltf.animations[0]).play();
+    gltf.scene.position.set(0, -1, 0);
 });
-function animate(time) {
-    if (car) car.rotation.y = -time / 3000;
+document.addEventListener("mousedown", onDocumentMouseDown, false);
+function onDocumentMouseDown(event) {
+    console.log("Click.");
+    render();
+}
+function render() {
+    requestAnimationFrame(render);
+    var delta = clock.getDelta();
+    if (mixer != null) mixer.update(delta);
     renderer.render(scene, camera);
 }
-renderer.setAnimationLoop(animate);
-window.addEventListener("resize", function() {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-});
+//LIGHT
+var ambientLight = new _three.AmbientLight(0xffffff, 0.7);
+scene.add(ambientLight);
+light = new _three.PointLight(0xffffff, 0.8, 18);
+light.position.set(0, 2, 4);
+light.castShadow = true;
+light.shadow.camera.near = 0.1;
+light.shadow.camera.far = 25;
+scene.add(light);
+camera.position.z = 5;
+camera.position.set(0, 0, 5);
+var controls = new (0, _orbitControlsJs.OrbitControls)(camera, renderer.domElement);
+controls.update();
+var animate = function() {
+    requestAnimationFrame(animate);
+    renderer.render(scene, camera);
+};
+animate();
 
 },{"three":"ktPTu","three/examples/jsm/controls/OrbitControls.js":"7mqRv","three/examples/jsm/loaders/GLTFLoader.js":"dVRsF","three/examples/jsm/loaders/RGBELoader.js":"cfP3d"}],"ktPTu":[function(require,module,exports) {
 /**

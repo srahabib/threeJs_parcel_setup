@@ -1,74 +1,67 @@
 import * as THREE from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
-import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import {RGBELoader} from 'three/examples/jsm/loaders/RGBELoader.js';
 //import {Box3, Vector3} from 'three';
 
 
-const renderer = new THREE.WebGLRenderer({antialias: true});
+var clock = new THREE.Clock();
+            var scene = new THREE.Scene();
+      var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
 
-renderer.setSize(window.innerWidth, window.innerHeight);
+      var renderer = new THREE.WebGLRenderer();
+      renderer.setSize( window.innerWidth, window.innerHeight );
+      document.body.appendChild( renderer.domElement );
+            renderer.setClearColor(0x606060);
+            
+            var loader = new GLTFLoader();
+        loader.load( 'assets/scene.gltf', function ( gltf ) {
+                    
+                    var model = gltf.scene;
+                    scene.add(model);
+                    mixer = new THREE.AnimationMixer(model);
+                    mixer.clipAction(gltf.animations[0]).play();
+                    gltf.scene.position.set(0, -1, 0);
+                    },  
+                );
+            
+         document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 
-document.body.appendChild(renderer.domElement);
+            function onDocumentMouseDown( event ) 
+            {
+                console.log("Click.");
+                render();
+            }
 
-const scene = new THREE.Scene();
+            function render() {
+            requestAnimationFrame(render);
+            var delta = clock.getDelta();
+            if (mixer != null) {
+                mixer.update(delta);
+            };
+            renderer.render(scene, camera);
+            }
+            
 
-const camera = new THREE.PerspectiveCamera(
-    75,
-    window.innerWidth / window.innerHeight,
-    0.1,
-    100
-);
+            //LIGHT
+            var ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+            scene.add(ambientLight);
+            light = new THREE.PointLight(0xffffff, 0.8, 18);
+            light.position.set(0,2,4);
+            light.castShadow = true;
+            light.shadow.camera.near = 0.1;
+            light.shadow.camera.far = 25;
+            scene.add(light);
 
-renderer.setClearColor(0xA3A3A3);
+            camera.position.z = 5;
+            camera.position.set( 0, 0, 5 );
+            
+            var controls = new OrbitControls( camera, renderer.domElement );
+            controls.update();
 
-const orbit = new OrbitControls(camera, renderer.domElement);
+        var animate = function () {
+        requestAnimationFrame( animate );
+        renderer.render( scene, camera );
+      };
 
-camera.position.set(0,1,2);
-
-orbit.update();
-
- const grid = new THREE.GridHelper(30, 30);
- scene.add(grid);
-
- const ambientLight = new THREE.AmbientLight(0xededed, 0.8);
- scene.add(ambientLight);
-
- const directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
- scene.add(directionalLight);
- directionalLight.position.set(10, 11, 7);
-
-// const geometry = new THREE.BoxGeometry( 1, 1, 1 );
-// const material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
-// const cube = new THREE.Mesh( geometry, material );
-// scene.add( cube );
-
-const gltfLoader = new GLTFLoader();
-
-const rgbeLoader = new RGBELoader();
-
-//renderer.outputEncoding = THREE.sRGBEncoding;
-// renderer.toneMapping = THREE.ACESFilmicToneMapping;
-// renderer.toneMappingExposure = 4;
-
-let car;
-    gltfLoader.load('./assets/scene.gltf', function(gltf) {
-        const model = gltf.scene;
-        model.scale.set(0.006,0.006,0.006);
-        scene.add(model);
-        car = model;
-});
-
-function animate(time) {
-     if(car)
-         car.rotation.y = - time / 3000;
-    renderer.render(scene, camera);
-}
-
-renderer.setAnimationLoop(animate);
-
-window.addEventListener('resize', function() {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-});
+      animate();
