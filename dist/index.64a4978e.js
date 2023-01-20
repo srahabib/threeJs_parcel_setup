@@ -537,6 +537,8 @@ var _orbitControlsJs = require("three/examples/jsm/controls/OrbitControls.js");
 var _gltfloaderJs = require("three/examples/jsm/loaders/GLTFLoader.js");
 var _rgbeloaderJs = require("three/examples/jsm/loaders/RGBELoader.js");
 //import {Box3, Vector3} from 'three';
+var action;
+var mixer = null;
 var clock = new _three.Clock();
 var scene = new _three.Scene();
 var camera = new _three.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -549,19 +551,16 @@ loader.load("assets/scene.gltf", function(gltf) {
     var model = gltf.scene;
     scene.add(model);
     mixer = new _three.AnimationMixer(model);
-    mixer.clipAction(gltf.animations[0]).play();
+    action = mixer.clipAction(gltf.animations[0]);
+    action.setLoop(_three.LoopOnce);
     gltf.scene.position.set(0, -1, 0);
 });
 document.addEventListener("mousedown", onDocumentMouseDown, false);
 function onDocumentMouseDown(event) {
-    console.log("Click.");
-    render();
-}
-function render() {
-    requestAnimationFrame(render);
-    var delta = clock.getDelta();
-    if (mixer != null) mixer.update(delta);
-    renderer.render(scene, camera);
+    if (action !== null) {
+        action.stop();
+        action.play();
+    }
 }
 //LIGHT
 var ambientLight = new _three.AmbientLight(0xffffff, 0.7);
@@ -578,6 +577,8 @@ var controls = new (0, _orbitControlsJs.OrbitControls)(camera, renderer.domEleme
 controls.update();
 var animate = function() {
     requestAnimationFrame(animate);
+    var delta = clock.getDelta();
+    if (mixer !== null) mixer.update(delta);
     renderer.render(scene, camera);
 };
 animate();

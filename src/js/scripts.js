@@ -4,10 +4,11 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import {RGBELoader} from 'three/examples/jsm/loaders/RGBELoader.js';
 //import {Box3, Vector3} from 'three';
 
-
+var action;
+var mixer = null;
 var clock = new THREE.Clock();
-            var scene = new THREE.Scene();
-      var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+var scene = new THREE.Scene();
+var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
 
       var renderer = new THREE.WebGLRenderer();
       renderer.setSize( window.innerWidth, window.innerHeight );
@@ -20,7 +21,9 @@ var clock = new THREE.Clock();
                     var model = gltf.scene;
                     scene.add(model);
                     mixer = new THREE.AnimationMixer(model);
-                    mixer.clipAction(gltf.animations[0]).play();
+                    action = mixer.clipAction(gltf.animations[0]);
+                    action.setLoop( THREE.LoopOnce );
+
                     gltf.scene.position.set(0, -1, 0);
                     },  
                 );
@@ -29,18 +32,15 @@ var clock = new THREE.Clock();
 
             function onDocumentMouseDown( event ) 
             {
-                console.log("Click.");
-                render();
+                if ( action !== null ) {
+
+                    action.stop();
+                    action.play();
+                    
+                  }
             }
 
-            function render() {
-            requestAnimationFrame(render);
-            var delta = clock.getDelta();
-            if (mixer != null) {
-                mixer.update(delta);
-            };
-            renderer.render(scene, camera);
-            }
+
             
 
             //LIGHT
@@ -60,8 +60,15 @@ var clock = new THREE.Clock();
             controls.update();
 
         var animate = function () {
-        requestAnimationFrame( animate );
-        renderer.render( scene, camera );
+            requestAnimationFrame( animate );
+
+            var delta = clock.getDelta();
+          
+            if (mixer !== null) {
+              mixer.update(delta);
+            };
+          
+            renderer.render( scene, camera );
       };
 
       animate();
