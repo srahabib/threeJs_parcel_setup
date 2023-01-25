@@ -6,6 +6,7 @@ import {RGBELoader} from 'three/examples/jsm/loaders/RGBELoader.js';
 //import {planVertexShader} from 'three/examples/jsm/shaders/PlanVertexShader.js';
 //import {planFragmentShader} from './shaders/planFragmentShader.js';
 import {CSS2DRenderer, CSS2DObject} from 'three/examples/jsm/renderers/CSS2DRenderer.js';
+import stars from '../img/windows.jpg';
 
 const renderer = new THREE.WebGLRenderer({antialias: true});
 
@@ -97,22 +98,26 @@ scene.add(label);
 //rend=new THREE.WebGLRenderer({canvas:canvas,antialias:true,alpha:true,transparent:true,premultipliedAlpha:false});
 const CanvasTexture = new THREE.CanvasTexture(scene);
 //making the plane
-const planeGeometry = new THREE.PlaneGeometry(32,32,32,32);
+const planeGeometry = new THREE.PlaneGeometry(8,8,8,8);
 const planeMaterial = new THREE.ShaderMaterial({
   side: THREE.DoubleSide,
   uniforms: {
     time: {type: "f", value: 1.0},
     uTime:{type: "f", value: 1.0},
     uTexture: {value: CanvasTexture.Texture},
+    image: {type: "t", value: new THREE.TextureLoader().load(stars)},
     },
 
     vertexShader: document.getElementById('vertexShader').textContent,
     fragmentShader: document.getElementById('fragmentShader').textContent,
+    // wireframe: false
     
 
 });
 const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
-planeMesh.scale.set(1.5,1.5,1.5);
+planeMesh.scale.set(0.1,0.1,0.2);
+planeMesh.position.set(0,0.8,0);
+planeMesh.rotation.x = -Math.PI/48;
 scene.add(planeMesh);
 
 
