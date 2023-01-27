@@ -13,18 +13,15 @@
       p {
         color: red;
       }
-      #container {
-        z-index: 1;
-        background-color: aliceblue;
-      }
     </style>
   </head>
   <body id="body">
-    <div id="container">
-      <p id="pepe">Page</p>
-      <p>lezzzzzzzgooooooooooo</p>
-      <a href="page.html">page</a>
-    </div>
+    <canvas id="canvasID">
+      <p>hi on canva</p>
+    </canvas>
+
+    <div id="container"></div>
+
     <script id="vertexShader" type="vertex">
       varying vec2 vUv;
        void main() {
@@ -39,11 +36,15 @@
     </script>
 
     <script id="fragmentShader" type="fragment">
-      uniform sampler2D image;
+      uniform sampler2D uTexture;
+
       varying vec2 vUv;
+
       void main() {
-        vec4 texture = texture2D(image,vUv);
-        gl_FragColor = vec4(texture.r, texture.g, texture.b, 5);
+        vec3 t = texture2D(uTexture, vUv).rgb;
+
+
+        gl_FragColor = vec4( t, 1.0 );
       }
     </script>
     <script src="./js/scripts.js" type="module"></script>
