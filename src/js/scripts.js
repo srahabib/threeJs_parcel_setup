@@ -10,23 +10,26 @@ import {CSS3DRenderer, CSS3DObject} from 'three/examples/jsm/renderers/CSS3DRend
 import stars from '../img/windows.jpg';
 
 
-const canvas = document.getElementById("canvasID");
+//const canvas = document.getElementById("canvasID");
 
-var bitmap = document.createElement('canvas');
- var g = bitmap.getContext('2d');
- bitmap.width = 100;
- bitmap.height = 100;
- g.font = 'Bold 20px Arial';
+// var bitmap = document.createElement('canvas');
+//  var ctx = bitmap.getContext('2d');
+//  bitmap.width = 100;
+//  bitmap.height = 100;
+//  ctx.font = 'Bold 20px Arial';
 
- g.fillStyle = 'white';
- g.fillText('text', 0, 20);
- g.strokeStyle = 'black';
- g.strokeText('text', 0, 20);
+//  ctx.fillStyle = 'red';
+//  ctx.fillText('death lol ', 0, 20);
+//  ctx.strokeStyle = 'black';
+
+ 
+ 
+
 //var bitmap = document.getElementsByTagName('html')[0].innerHTML;
 
 
 const renderer = new THREE.WebGLRenderer({
-  canvas: canvas,
+  //canvas: canvas,
   antialias: true,
 });
 
@@ -92,9 +95,25 @@ orbit.update();
 
 
 // Render target
+let labelRenderer = new CSS3DRenderer();
+  labelRenderer.setSize(window.innerWidth, window.innerHeight);
+  labelRenderer.domElement.style.position = 'absolute';
+  labelRenderer.domElement.style.top = '0px';
+  labelRenderer.domElement.style.pointerEvents = 'none';
+  document.body.appendChild(labelRenderer.domElement);
 
-//const renderTarget = new THREE.CanvasTexture(canvas);
-//renderTarget.needsUpdate = true;
+const p = document.createElement('p');
+p.textContent = 'Hello world';
+p.style.color = 'red';
+ const cPoint = new CSS3DObject(p);
+ cPoint.position.set(0,0,0);
+ scene.add(cPoint);
+
+// const div = document.createElement('container');
+// div.appendChild(p);
+// const divContainer = new CSS3DObject(div);
+// scene.add(divContainer);
+
 
 
 
@@ -106,7 +125,8 @@ const planeMaterial = new THREE.ShaderMaterial({
   uniforms: {
     time: {type: "f", value: 1.0},
     uTime:{type: "f", value: 1.0},
-    uTexture: {type: "t",value: new THREE.CanvasTexture(bitmap)},
+    //uTexture: {type: "t",value: new THREE.CanvasTexture(bitmap)},
+    //uTexture: {type: "t",value: new THREE.TextureLoader(cPoint)},
     //image: {type: "t", value: new THREE.TextureLoader().load(stars)},
     },
 
@@ -124,7 +144,7 @@ scene.add(planeMesh);
 
 
 function animate(time) {
-  //labelRenderer.render(scene, camera);
+  labelRenderer.render(scene, camera);
   //label.rotation.y += 0.01;
     //  if(car)
     //      car.rotation.y = - time / 3000;
@@ -137,5 +157,5 @@ window.addEventListener('resize', function() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
-    //labelRenderer.setSize(window.innerWidth, window.innerHeight);
+    labelRenderer.setSize(window.innerWidth, window.innerHeight);
 });
