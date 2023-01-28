@@ -102,17 +102,30 @@ let labelRenderer = new CSS3DRenderer();
   labelRenderer.domElement.style.pointerEvents = 'none';
   document.body.appendChild(labelRenderer.domElement);
 
-const p = document.createElement('p');
-p.textContent = 'Hello world';
-p.style.color = 'red';
- const cPoint = new CSS3DObject(p);
- cPoint.position.set(0,0,0);
- scene.add(cPoint);
 
-// const div = document.createElement('container');
-// div.appendChild(p);
-// const divContainer = new CSS3DObject(div);
-// scene.add(divContainer);
+  
+const p = document.createElement('a');
+var link = document.createTextNode("This is a link");
+p.appendChild(link);
+p.title = "This is Link";
+p.href = "https://www.google.com";
+// p.textContent = 'hi';
+// p.style.fontSize = '0.5px';
+
+//p.style.color = 'red';
+//  const cPoint = new CSS3DObject(p);
+//  cPoint.position.set(0,0,0);
+//  scene.add(cPoint);
+
+ const div = document.createElement('div');
+ div.appendChild(p);
+ div.style.width = '1.5px';
+ div.style.height = '1.5px';
+ div.style.background = new THREE.Color( Math.random() * 0xffffff ).getStyle();
+
+
+ const divContainer = new CSS3DObject(div);
+ scene.add(divContainer);
 
 
 
@@ -122,12 +135,15 @@ p.style.color = 'red';
 const planeGeometry = new THREE.PlaneGeometry(8,8,8,8);
 const planeMaterial = new THREE.ShaderMaterial({
   side: THREE.DoubleSide,
+  blending: THREE.NoBlending,
+  
   uniforms: {
     time: {type: "f", value: 1.0},
     uTime:{type: "f", value: 1.0},
     //uTexture: {type: "t",value: new THREE.CanvasTexture(bitmap)},
     //uTexture: {type: "t",value: new THREE.TextureLoader(cPoint)},
     //image: {type: "t", value: new THREE.TextureLoader().load(stars)},
+    
     },
 
     vertexShader: document.getElementById('vertexShader').textContent,
@@ -136,6 +152,7 @@ const planeMaterial = new THREE.ShaderMaterial({
 
 
 });
+
 const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
 planeMesh.scale.set(0.1,0.1,0.2);
 planeMesh.position.set(0,0.8,0);
