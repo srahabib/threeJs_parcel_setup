@@ -32,6 +32,9 @@ const renderer = new THREE.WebGLRenderer({
   //canvas: canvas,
   antialias: true,
 });
+renderer.domElement.style.position = 'absolute';
+renderer.domElement.style.top = 0;
+renderer.setPixelRatio(window.devicePixelRatio);
 
 renderer.setSize(window.innerWidth, window.innerHeight);
 
@@ -99,7 +102,7 @@ let labelRenderer = new CSS3DRenderer();
   labelRenderer.setSize(window.innerWidth, window.innerHeight);
   labelRenderer.domElement.style.position = 'absolute';
   labelRenderer.domElement.style.top = '0px';
-  labelRenderer.domElement.style.pointerEvents = 'none';
+  //labelRenderer.domElement.style.pointerEvents = 'none';
   document.body.appendChild(labelRenderer.domElement);
 
 
@@ -129,6 +132,7 @@ let labelRenderer = new CSS3DRenderer();
   const rtAspect = rtWidth / rtHeight;
   const rtscene = new THREE.Scene();
   const renderTarget = new THREE.WebGLRenderTarget(rtWidth, rtHeight);
+  
   const rtCamera = new THREE.PerspectiveCamera(rtFov, rtAspect, rtNear, rtFar);
   rtCamera.position.z = 36;
 
@@ -140,32 +144,38 @@ let labelRenderer = new CSS3DRenderer();
   rtscene.background = new THREE.Color(0xF8C8DC);
 
 
-  const p = document.createElement('p');
-  p.textContent = 'hi';
-  p.style.fontSize = '5px';
-  const div = document.createElement('div');
-  div.appendChild(p);
-  div.style.width = '20px';
-  div.style.height = '20px';
-  div.style.background = new THREE.Color( Math.random() * 0xffffff ).getStyle();
- 
-  const divContainer = new CSS3DObject(div);
-  rtscene.add(divContainer);
+  const p = document.createElement('a');
+  var link = document.createTextNode("This is a link");
+  p.appendChild(link);
+  p.title = "This is Link";
+  p.href = "page.html";
+  // p.textContent = 'hi';
+   p.style.fontSize = '1px';
+   p.style.textDecoration = 'none';
+  
+  //p.style.color = 'red';
+  //  const cPoint = new CSS3DObject(p);
+  //  cPoint.position.set(0,0,0);
+  //  scene.add(cPoint);
+  
+   const div = document.createElement('div');
+   div.appendChild(p);
+   //div.style.width = '1.5px';
+   //div.style.height = '1.5px';
+   //div.style.background = new THREE.Color( Math.random() * 0xffffff ).getStyle();
+  
+  
+   const divContainer = new CSS3DObject(div);
+   rtscene.add(divContainer);
 
 
-  new GLTFLoader().load('./assets/scene.gltf', function(gltf) {
 
-    const model = gltf.scene;
-    model.scale.set(70,70,70);
-    rtscene.add(model);
-    car = model;
-  });
 
 //making the plane
 const planeGeometry = new THREE.PlaneGeometry(8,8,8,8);
 const planeMaterial = new THREE.ShaderMaterial({
   side: THREE.DoubleSide,
-  //blending: THREE.NoBlending,
+  blending: THREE.NoBlending,
   
   uniforms: {
     time: {type: "f", value: 1.0},
@@ -191,7 +201,7 @@ scene.add(planeMesh);
 
 
 function animate(time) {
-  //labelRenderer.render(rtscene, rtCamera);
+  labelRenderer.render(rtscene, rtCamera);
   rtCamera.rotation.x= camera.rotation.x;
   rtCamera.rotation.y= camera.rotation.y;
   rtCamera.rotation.z= camera.rotation.z;
