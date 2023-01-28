@@ -104,44 +104,74 @@ let labelRenderer = new CSS3DRenderer();
 
 
   
-const p = document.createElement('a');
-var link = document.createTextNode("This is a link");
-p.appendChild(link);
-p.title = "This is Link";
-p.href = "https://www.google.com";
-// p.textContent = 'hi';
-// p.style.fontSize = '0.5px';
+//const p = document.createElement('p');
+//ar link = document.createTextNode("This is a link");
+//p.appendChild(link);
+// p.title = "This is Link";
+// p.href = "https://www.google.com";
+ //p.textContent = 'hi';
+ //p.style.fontSize = '5px';
 
 //p.style.color = 'red';
 //  const cPoint = new CSS3DObject(p);
 //  cPoint.position.set(0,0,0);
 //  scene.add(cPoint);
 
- const div = document.createElement('div');
- div.appendChild(p);
- div.style.width = '1.5px';
- div.style.height = '1.5px';
- div.style.background = new THREE.Color( Math.random() * 0xffffff ).getStyle();
 
 
- const divContainer = new CSS3DObject(div);
- scene.add(divContainer);
+//render target
+  // NOTE: Render target.
+  const rtFov = 75;
+  const rtNear = 0.1;
+  const rtFar = 100;
+  const rtWidth = 100;
+  const rtHeight = 100;
+  const rtAspect = rtWidth / rtHeight;
+  const rtscene = new THREE.Scene();
+  const renderTarget = new THREE.WebGLRenderTarget(rtWidth, rtHeight);
+  const rtCamera = new THREE.PerspectiveCamera(rtFov, rtAspect, rtNear, rtFar);
+  rtCamera.position.z = 36;
+
+  const color = 0xffffff;
+  const intensity = 1;
+  const light = new THREE.DirectionalLight(color, intensity);
+  light.position.set(0, 0, 200);
+  rtscene.add(light);
+  rtscene.background = new THREE.Color(0xF8C8DC);
 
 
+  const p = document.createElement('p');
+  p.textContent = 'hi';
+  p.style.fontSize = '5px';
+  const div = document.createElement('div');
+  div.appendChild(p);
+  div.style.width = '20px';
+  div.style.height = '20px';
+  div.style.background = new THREE.Color( Math.random() * 0xffffff ).getStyle();
+ 
+  const divContainer = new CSS3DObject(div);
+  rtscene.add(divContainer);
 
 
+  new GLTFLoader().load('./assets/scene.gltf', function(gltf) {
+
+    const model = gltf.scene;
+    model.scale.set(70,70,70);
+    rtscene.add(model);
+    car = model;
+  });
 
 //making the plane
 const planeGeometry = new THREE.PlaneGeometry(8,8,8,8);
 const planeMaterial = new THREE.ShaderMaterial({
   side: THREE.DoubleSide,
-  blending: THREE.NoBlending,
+  //blending: THREE.NoBlending,
   
   uniforms: {
     time: {type: "f", value: 1.0},
     uTime:{type: "f", value: 1.0},
     //uTexture: {type: "t",value: new THREE.CanvasTexture(bitmap)},
-    //uTexture: {type: "t",value: new THREE.TextureLoader(cPoint)},
+    uTexture: { value: renderTarget.texture },
     //image: {type: "t", value: new THREE.TextureLoader().load(stars)},
     
     },
@@ -161,11 +191,18 @@ scene.add(planeMesh);
 
 
 function animate(time) {
-  labelRenderer.render(scene, camera);
+  //labelRenderer.render(rtscene, rtCamera);
+  rtCamera.rotation.x= camera.rotation.x;
+  rtCamera.rotation.y= camera.rotation.y;
+  rtCamera.rotation.z= camera.rotation.z;
+  
+  renderer.setRenderTarget(renderTarget);
+  renderer.render(rtscene, rtCamera);
+  renderer.setRenderTarget(null);
   //label.rotation.y += 0.01;
     //  if(car)
     //      car.rotation.y = - time / 3000;
-    renderer.render(scene, camera);
+  renderer.render(scene, camera);
 }
 
 renderer.setAnimationLoop(animate);
