@@ -144,30 +144,32 @@ let labelRenderer = new CSS3DRenderer();
   rtscene.background = new THREE.Color(0xF8C8DC);
 
 
-  const p = document.createElement('a');
-  var link = document.createTextNode("This is a link");
-  p.appendChild(link);
-  p.title = "This is Link";
-  p.href = "page.html";
-  // p.textContent = 'hi';
-   p.style.fontSize = '1px';
-   p.style.textDecoration = 'none';
-  
-  //p.style.color = 'red';
-  //  const cPoint = new CSS3DObject(p);
-  //  cPoint.position.set(0,0,0);
-  //  scene.add(cPoint);
-  
-   const div = document.createElement('div');
-   div.appendChild(p);
-   //div.style.width = '1.5px';
-   //div.style.height = '1.5px';
-   //div.style.background = new THREE.Color( Math.random() * 0xffffff ).getStyle();
-  
-  
-   const divContainer = new CSS3DObject(div);
-   rtscene.add(divContainer);
+//
 
+const div = document.createElement( 'div' );
+				div.style.width = '1px';
+				div.style.height = '1px';
+				div.style.backgroundColor = '#000';
+
+				const iframe = document.getElementById( 'i' );
+				iframe.style.width = '310px';
+				iframe.style.height = '250px';
+				iframe.style.border = '0px';
+				iframe.src = [ 'page.html' ];
+				div.appendChild( iframe );
+        
+
+				const object = new CSS3DObject( div );
+         object.position.set( -8, 21, 0 );
+        // object.rotation.x = 0;
+        object.scale.set( 0.05, 0.05, 0.05 );
+        rtscene.add(object);
+
+
+
+
+
+//
 
 
 
@@ -202,9 +204,9 @@ scene.add(planeMesh);
 
 function animate(time) {
   labelRenderer.render(rtscene, rtCamera);
-  rtCamera.rotation.x= camera.rotation.x;
-  rtCamera.rotation.y= camera.rotation.y;
-  rtCamera.rotation.z= camera.rotation.z;
+  // rtCamera.rotation.x= camera.rotation.x;
+  // rtCamera.rotation.y= camera.rotation.y;
+  // rtCamera.rotation.z= camera.rotation.z;
   
   renderer.setRenderTarget(renderTarget);
   renderer.render(rtscene, rtCamera);
